@@ -1,0 +1,13 @@
+- name: Install Podman on Azure VM
+  hosts: azure_vm
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Podman
+      apt:
+        name: podman
+        state: present

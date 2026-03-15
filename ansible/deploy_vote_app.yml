@@ -1,0 +1,64 @@
+- name: Deploy Azure Vote app on Azure VM with Podman
+  hosts: azure_vm
+  become: true
+
+  vars:
+    pod_name: vote-pod
+    redis_container_name: redis
+    frontend_container_name: azure-vote-front
+    redis_image: docker.io/library/redis:7
+    frontend_image: docker.io/jsosa15/azure-vote-front:v1
+    frontend_host_port: "8080"
+    frontend_container_port: "80"
+
+  tasks:
+    - name: Ensure Podman is installed
+      apt:
+        name: podman
+        state: present
+        update_cache: yes
+
+    - name: Remove frontend container if it exists
+      shell: |
+        podman rm -f {{ frontend_container_name }} || true
+      args:
+        executable: /bin/bash
+
+    - name: Remove Redis container if it exists
+      shell: |
+        podman rm -f {{ redis_container_name }} || true
+      args:
+        executable: /bin/bash
+
+    - name: Remove pod if it exists
+      shell: |
+        podman pod rm -f {{ pod_name }} || true
+      args:
+        executable: /bin/bash
+
+    - name: Create pod
+      shell: |
+        podman pod create \
+          --name {{ pod_name }} \
+          -p {{ frontend_host_port }}:{{ frontend_container_port }}
+      args:
+        executable: /bin/bash
+
+    - name: Run Redis container in pod
+      shell: |
+        podman run -d \
+          --name {{ redis_container_name }} \
+          --pod {{ pod_name }} \
+          {{ redis_image }}
+      args:
+        executable: /bin/bash
+
+    - name: Run frontend container in pod
+      shell: |
+        podman run -d \
+          --name {{ frontend_container_name }} \
+          --pod {{ pod_name }} \
+          -e REDIS=127.0.0.1 \
+          {{ frontend_image }}
+      args:
+        executable: /bin/bash

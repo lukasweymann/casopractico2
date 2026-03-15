@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-app
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      initContainers:
+        - name: init-html
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              mkdir -p /mnt
+              echo '<h1>El almacenamiento persistente functiona</h1><p>El fichero está guardado en el PVC.</p>' > /mnt/index.html
+              chmod 644 /mnt/index.html
+              ls -la /mnt
+              cat /mnt/index.html
+          volumeMounts:
+            - name: nginx-storage
+              mountPath: /mnt
+      containers:
+        - name: nginx
+          image: nginx:stable
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-storage
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: nginx-storage
+          persistentVolumeClaim:
+            claimName: nginx-pvc
