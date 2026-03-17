@@ -52,8 +52,11 @@ Se genera automáticamente durante terraform apply a partir de la IP pública ac
    terraform apply
 ```
 
+## Hay que subir la imagen al repo ACR para tenerla disponible, es necesario para cumplir los requisitos y tenerla si se destruyen los recursos
+
 ```
 cd ../scripts
+chmod +x push-aks-image.sh
 ./push-aks-image.sh
 ```
 
@@ -146,8 +149,10 @@ kubectl get pods -w
 Verificar que el fichero sigue existiendo:
 
 ```bash
-kubectl exec -it deploy/nginx-app -- sh -c "cat /usr/share/nginx/html/persistence-check.txt" 8. Destrucción de recursos
+kubectl exec -it deploy/nginx-app -- sh -c "cat /usr/share/nginx/html/persistence-check.txt"
 ```
+
+# 8. Destrucción de recursos
 
 Primero eliminar los recursos de Kubernetes:
 
