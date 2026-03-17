@@ -52,6 +52,11 @@ Se genera automáticamente durante terraform apply a partir de la IP pública ac
    terraform apply
 ```
 
+```
+cd ../scripts
+./push-aks-image.sh
+```
+
 # 3. Configuración de la VM
 
 ```bash
