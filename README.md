@@ -1,6 +1,14 @@
 # Caso Práctico 2
 
+## Nota
+
+Este proyecto ha sido probado desde cero siguiendo exactamente los pasos descritos en este README.
+
 ## Objetivo
+
+El objetivo de este proyecto es desplegar una solución completa en Azure utilizando herramientas DevOps como Terraform, Ansible y Kubernetes.
+
+Se busca automatizar la creación de la infraestructura y el despliegue de aplicaciones en contenedores tanto en una máquina virtual como en un clúster AKS.
 
 Desplegar:
 
@@ -8,6 +16,16 @@ Desplegar:
 - una aplicación en contenedor con Podman sobre una máquina virtual en Azure
 - un clúster AKS
 - una aplicación en AKS con almacenamiento persistente
+
+## Licencia
+
+Este proyecto se distribuye bajo licencia MIT-0.
+
+Esto permite el uso, copia y modificación del código sin necesidad de atribución.
+
+El software se proporciona "tal cual", sin garantías, y el autor no se hace responsable del uso que terceros puedan hacer del mismo.
+
+Este proyecto tiene fines educativos.
 
 ## Estructura del proyecto
 
@@ -31,10 +49,9 @@ Además, es necesario disponer de una clave SSH local para la VM:
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/azure_vm_key
 ```
 
-Nota sobre el inventario de Ansible
+### Nota sobre el inventario de Ansible
 
-El fichero ansible/inventory.ini no se edita manualmente.
-Se genera automáticamente durante terraform apply a partir de la IP pública actual de la máquina virtual.
+Este fichero se genera automáticamente con la IP de la VM, por lo que no es necesario modificarlo manualmente.
 
 # Pasos para probar la solución:
 
@@ -52,7 +69,11 @@ Se genera automáticamente durante terraform apply a partir de la IP pública ac
    terraform apply
 ```
 
-## Hay que subir la imagen al repo ACR para tenerla disponible, es necesario para cumplir los requisitos y tenerla si se destruyen los recursos
+## Subida de imagen a ACR
+
+Es necesario subir la imagen al Azure Container Registry para que AKS pueda descargarla.
+
+Este paso es importante ya que, al recrear la infraestructura, el registro estará vacío.
 
 ```
 cd ../scripts
@@ -94,14 +115,14 @@ az aks get-credentials --resource-group rg-casopractico2 --name aks-casopractico
 kubectl get nodes
 ```
 
-6. Despliegue en AKS
+# 6. Despliegue en AKS
 
 ```bash
 cd ../k8s
 kubectl apply -f .
 ```
 
-7. Verificación de la app en AKS
+# 7. Verificación de la app en AKS
 
 Comprobar recursos:
 
@@ -132,6 +153,8 @@ AKS + Kubernetes → usa la IP externa del servicio LoadBalancer y el puerto 80
 Por eso ambas IPs son diferentes.
 
 Verificación del almacenamiento persistente en AKS
+
+Esto permite comprobar que los datos no se pierden aunque el pod sea eliminado.
 
 Crear un fichero de prueba dentro del volumen persistente:
 
